@@ -4,38 +4,24 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import { AppRegistry, Navigator, Text, View } from 'react-native';
+import React, {Component} from 'react';
+import {AppRegistry} from 'react-native';
+import {createStore, applyMiddleware, combineReducers} from 'redux';
+import createLogger from 'redux-logger';
+import thunk from 'redux-thunk';
+import {instrumentReducer} from './src/instrument';
+import {authReducer} from './src/auth';
+import {Router} from './src/Router'
 
-import MyScene from './src/MyScene';
+const rootReducer = combineReducers({instrument: instrumentReducer, auth: authReducer});
+const store = createStore(rootReducer, applyMiddleware(thunk, createLogger()));
+// const store = createStore(rootReducer, applyMiddleware(thunk));
 
-class Lab_React extends Component {
+export default class Lab_React extends Component {
   render() {
     return (
-      <Navigator
-        initialRoute={{ title: 'Index', index: 0 }}
-        renderScene={(route, navigator) =>
-          <MyScene
-            title={route.title}
-            index={route.index}
-
-            onForward={ () => {
-              const nextIndex = route.index + 1;
-              navigator.push({
-                title: 'Scene ' + nextIndex,
-                index: nextIndex,
-              });
-            }}
-
-            onBack={() => {
-              if (route.index > 0) {
-                navigator.pop();
-              }
-            }}
-          />
-        }
-      />
-    )
+      <Router store={store}/>
+    );
   }
 }
 
